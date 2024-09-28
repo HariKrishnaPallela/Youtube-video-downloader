@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YT Video Downloader</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Download YouTube Video</h1>
+        <!-- Form to handle video download -->
+        <form id="downloadForm">
+            <div class="search-bar">
+                <input type="text" name="link" id="videoLink" placeholder="Paste YouTube link here" required>
+                <button type="submit">Download</button>
+            </div>
+        </form>
+
+        <!-- Message display section -->
+        <div id="message" class="message"></div>
+    </div>
+
+    <script>
+        // Add event listener to the form
+        document.getElementById('downloadForm').addEventListener('submit', async function(event) {
+            event.preventDefault(); // Prevent the default form submission
+
+            // Clear previous messages
+            const messageDiv = document.getElementById('message');
+            messageDiv.innerHTML = '';
+
+            // Create a FormData object from the form
+            const formData = new FormData(event.target);
+
+            try {
+                // Display "Download started" message
+                messageDiv.innerHTML = '<p>Download started...</p>';
+
+                // Send a POST request with the form data
+                const response = await fetch('http://localhost:8000/download', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                // Check if the response is OK (status 200)
+                if (response.ok) {
+                    const result = await response.json();
+                    console.log('Response:', result);
+
+                    // Display "Download ended" message
+                    messageDiv.innerHTML += '<p>Download completed successfully!</p>';
+                } else {
+                    console.error('Error:', response.statusText);
+                    messageDiv.innerHTML += '<p>Failed to start the download.</p>';
+                }
+            } catch (error) {
+                console.error('Request error:', error);
+                messageDiv.innerHTML += '<p>An error occurred. Please try again later.</p>';
+            } finally {
+                // Display "Download ended" message even if an error occurs
+                messageDiv.innerHTML += '<p>Download ended.</p>';
+            }
+        });
+    </script>
+</body>
+</html>
